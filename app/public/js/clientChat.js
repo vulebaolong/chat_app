@@ -6,6 +6,7 @@ const btnShareLocation = document.querySelector("#btn_share-location");
 const acknowledgements = (err) => {
     if (err) return console.log(err);
     console.log("gửi tin nhắn thành công");
+    formMessage.reset();
 };
 
 formMessage.addEventListener("submit", (e) => {
@@ -16,7 +17,7 @@ formMessage.addEventListener("submit", (e) => {
 });
 
 socket.on("sendMesFromServer", (mes) => {
-    console.log(mes);
+    console.log({ ...mes });
 });
 
 // Chia sẻ vị trí
@@ -29,7 +30,6 @@ btnShareLocation.addEventListener("click", () => {
         socket.emit("sendLocation", { latitude, longtitude }, acknowledgements);
     });
 });
-
 socket.on("sendLocation", (urlLocation) => {
     console.log(urlLocation);
 });
@@ -39,4 +39,10 @@ const querySting = location.search;
 const params = Qs.parse(querySting, {
     ignoreQueryPrefix: true,
 });
-console.log(params);
+const { room, username } = params;
+socket.emit("createRoom", { room, username });
+
+// xử lý userList
+socket.on("userList", (userList) => {
+    console.log(userList);
+});
