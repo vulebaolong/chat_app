@@ -7,7 +7,7 @@ const Filter = require("bad-words");
 
 const publicPathDirectory = path.join(__dirname, "../public");
 const { handleMes } = require("./utils/handleMes");
-const { getUserList } = require("./utils/userList");
+const { getUserList, addUser, deleteUser } = require("./utils/userList");
 
 // cài đặt static file
 app.use(express.static(publicPathDirectory));
@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
     console.log("connection");
 
     // room
-    socket.on("createRoom", ({ room, username }) => {
+    socket.on("createRoom", ({ room, userName }) => {
         socket.join(room);
 
         // gửi lời chào cho client vừa kết nối
@@ -48,14 +48,24 @@ io.on("connection", (socket) => {
             io.to(room).emit("sendLocation", handleMes(urlLocation));
             cb();
         });
-        console.log(getUserList());
+
+        addUser({
+            id: socket.id,
+            userName,
+            room,
+        });
         // xử lý list user
         io.to(room).emit("userList", getUserList(room));
-    });
 
-    // lắng nghe sự kiện ngắt kết nối
-    socket.on("disconnect", () => {
-        console.log("client left server");
+        // lắng nghe sự kiện ngắt kết nối
+        socket.on("disconnect", () => {
+            deleteUser(socket.id);
+            io.to(room).emit("exitRoom", {
+                userList: getUserList(room),
+                noti: `Người dùng ${userName} đã thoát khỏi phòng`,
+            });
+            console.log(`Người dùng ${userName} đã thoát khỏi phòng ${room}`);
+        });
     });
 });
 

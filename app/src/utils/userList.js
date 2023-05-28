@@ -1,4 +1,4 @@
-const userList = [
+let userList = [
     {
         id: 1,
         userName: "vũ lê bảo long",
@@ -16,10 +16,14 @@ const userList = [
     },
 ];
 
-const getUserList = (room) => {
-    return userList.filter((user) => user.room === room);
-};
+const addUser = (user) => (userList = [...userList, user]);
+
+const getUserList = (room) => userList.filter((user) => user.room === room);
+
+const deleteUser = (id) => (userList = userList.filter((user) => user.id !== id));
 
 module.exports = {
     getUserList,
+    addUser,
+    deleteUser,
 };

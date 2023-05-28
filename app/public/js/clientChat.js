@@ -39,10 +39,15 @@ const querySting = location.search;
 const params = Qs.parse(querySting, {
     ignoreQueryPrefix: true,
 });
-const { room, username } = params;
-socket.emit("createRoom", { room, username });
+const { room, username: userName } = params;
+socket.emit("createRoom", { room, userName });
 
 // xử lý userList
 socket.on("userList", (userList) => {
     console.log(userList);
+});
+
+// xử lý thoát room
+socket.on("exitRoom", (value) => {
+    console.log(value);
 });
